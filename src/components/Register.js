@@ -8,10 +8,25 @@ import Footer from "./Footer";
 import Header from "./Header";
 import "./Register.css";
 
-const Register = () => {
+const Register = (props) => {
   const { enqueueSnackbar } = useSnackbar();
+  const [formData, setFormData] = useState({
+    username:'',
+    password:'',
+    confirmPassword:''
+  });
 
+  let handleChange = (e) => {
+    setFormData((prev) => {
+      return {
+        ...prev,
+        [e.target.name]: e.target.value
+      };
+    });
+  };
 
+  
+ 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement the register function
   /**
    * Definition for register handler
@@ -35,7 +50,14 @@ const Register = () => {
    *      "message": "Username is already taken"
    * }
    */
-  const register = async (formData) => {
+  const register = (data, config) => {
+    axios.post(`${config.endpoint}/auth/register`, data)
+    .then(function (response) {
+      enqueueSnackbar('Registered successfully')
+    })
+    .catch(function (error) {
+      enqueueSnackbar(error.response.data.message);
+    });
   };
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
@@ -56,19 +78,36 @@ const Register = () => {
    * -    Check that password field is not less than 6 characters in length - "Password must be at least 6 characters"
    * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
-  const validateInput = (data) => {
+  const validateInput = () => {
+    if(formData.username.length==0 ){
+      enqueueSnackbar('Username is required');
+    } else if (formData.username.length<6){
+      enqueueSnackbar('Username must be at least 6 characters');
+    } else if (formData.password==0){
+      enqueueSnackbar('Password is required');
+    } else if (formData.password.length<6){
+      enqueueSnackbar('Password must be at least 6 characters');
+    }else if (formData.password !== formData.confirmPassword){
+      enqueueSnackbar('Passwords do not match');
+    }else {
+     let data = {
+        username:formData.username,
+        password:formData.password
+      }
+      register(data, config);
+    }
   };
 
   return (
     <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
+      // display="flex"
+      // flexDirection="column"
+      // justifyContent="space-between"
       minHeight="100vh"
     >
       <Header hasHiddenAuthButtons />
       <Box className="content">
-        <Stack spacing={2} className="form">
+        <Stack spacing={2} className="form" >
           <h2 className="title">Register</h2>
           <TextField
             id="username"
@@ -78,6 +117,8 @@ const Register = () => {
             name="username"
             placeholder="Enter Username"
             fullWidth
+            value={formData.username}
+            onChange={handleChange}
           />
           <TextField
             id="password"
@@ -85,9 +126,11 @@ const Register = () => {
             label="Password"
             name="password"
             type="password"
+            value={formData.password}
             helperText="Password must be atleast 6 characters length"
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
+            onChange={handleChange}
           />
           <TextField
             id="confirmPassword"
@@ -96,8 +139,10 @@ const Register = () => {
             name="confirmPassword"
             type="password"
             fullWidth
+            value={formData.confirmPassword}
+            onChange={handleChange}
           />
-           <Button className="button" variant="contained">
+           <Button className="button" variant="contained" onClick={validateInput}>
             Register Now
            </Button>
           <p className="secondary-action">
