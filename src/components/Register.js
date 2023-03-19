@@ -1,3 +1,4 @@
+import { useHistory, Link } from "react-router-dom";
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
@@ -9,6 +10,7 @@ import Header from "./Header";
 import "./Register.css";
 
 const Register = (props) => {
+  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const [Loader, setLoader]=useState(false);
   const [formData, setFormData] = useState({
@@ -29,6 +31,8 @@ const Register = (props) => {
   
  
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement the register function
+
+
   /**
    * Definition for register handler
    * - Function to be called when the user clicks on the register button or submits the register form
@@ -55,10 +59,10 @@ const Register = (props) => {
     try {
       setLoader(true)
       let res = await axios.post(`${config.endpoint}/auth/register`, data);
-      enqueueSnackbar('Registered successfully');
+      enqueueSnackbar('Registered successfully', {variant: "success"});
       setLoader(false)
     } catch(error){
-      enqueueSnackbar(error.response.data.message);
+      enqueueSnackbar(error.response.data.message, {variant: "error"});
       setLoader(false)
     } 
   //   axios.post(`${config.endpoint}/auth/register`, data)
@@ -90,15 +94,15 @@ const Register = (props) => {
    */
   const validateInput = () => {
     if(formData.username.length===0 ){
-      enqueueSnackbar('Username is required');
+      enqueueSnackbar('Username is required', {variant: "warning"});
     } else if (formData.username.length<6){
-      enqueueSnackbar('Username must be at least 6 characters');
+      enqueueSnackbar('Username must be at least 6 characters', {variant: "warning"});
     } else if (formData.password===0){
-      enqueueSnackbar('Password is required');
+      enqueueSnackbar('Password is required', {variant: "warning"});
     } else if (formData.password.length<6){
-      enqueueSnackbar('Password must be at least 6 characters');
+      enqueueSnackbar('Password must be at least 6 characters', {variant: "warning"});
     }else if (formData.password !== formData.confirmPassword){
-      enqueueSnackbar('Passwords do not match');
+      enqueueSnackbar('Passwords do not match', {variant: "warning"});
     }else {
      let data = {
         username:formData.username,
@@ -115,7 +119,7 @@ const Register = (props) => {
       // justifyContent="space-between"
       minHeight="100vh"
     >
-      <Header hasHiddenAuthButtons />
+      <Header hasHiddenAuthButtons={false} />
       <Box className="content">
         <Stack spacing={2} className="form" >
           <h2 className="title">Register</h2>
@@ -157,7 +161,11 @@ const Register = (props) => {
            </Button>
           <p className="secondary-action">
             Already have an account?{" "}
-             <a className="link" href="#">
+             <a className="link" href="#"
+              onClick={()=>{
+                history.push("/login")
+                }}
+                >
               Login here
              </a>
           </p>
