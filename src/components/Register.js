@@ -10,6 +10,7 @@ import "./Register.css";
 
 const Register = (props) => {
   const { enqueueSnackbar } = useSnackbar();
+  const [Loader, setLoader]=useState(false);
   const [formData, setFormData] = useState({
     username:'',
     password:'',
@@ -50,14 +51,23 @@ const Register = (props) => {
    *      "message": "Username is already taken"
    * }
    */
-  const register = (data, config) => {
-    axios.post(`${config.endpoint}/auth/register`, data)
-    .then(function (response) {
-      enqueueSnackbar('Registered successfully')
-    })
-    .catch(function (error) {
+  const register = async (data, config) => {
+    try {
+      setLoader(true)
+      let res = await axios.post(`${config.endpoint}/auth/register`, data);
+      enqueueSnackbar('Registered successfully');
+      setLoader(false)
+    } catch(error){
       enqueueSnackbar(error.response.data.message);
-    });
+      setLoader(false)
+    } 
+  //   axios.post(`${config.endpoint}/auth/register`, data)
+  //   .then(function (response) {
+  //     enqueueSnackbar('Registered successfully')
+  //   })
+  //   .catch(function (error) {
+  //     enqueueSnackbar(error.response.data.message);
+  //   });
   };
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
@@ -79,11 +89,11 @@ const Register = (props) => {
    * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
   const validateInput = () => {
-    if(formData.username.length==0 ){
+    if(formData.username.length===0 ){
       enqueueSnackbar('Username is required');
     } else if (formData.username.length<6){
       enqueueSnackbar('Username must be at least 6 characters');
-    } else if (formData.password==0){
+    } else if (formData.password===0){
       enqueueSnackbar('Password is required');
     } else if (formData.password.length<6){
       enqueueSnackbar('Password must be at least 6 characters');
@@ -143,7 +153,7 @@ const Register = (props) => {
             onChange={handleChange}
           />
            <Button className="button" variant="contained" onClick={validateInput}>
-            Register Now
+           { !Loader ? `Register Now`: <CircularProgress color="inherit"/>} 
            </Button>
           <p className="secondary-action">
             Already have an account?{" "}
