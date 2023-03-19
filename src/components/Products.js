@@ -23,40 +23,41 @@ const Products = () => {
   const history = useHistory();
   const [logged, setLogged] = useState(false);
   let persistLogin = JSON.parse(localStorage.getItem('persistLogin'));
-  console.log(persistLogin.token)
-  if(persistLogin.token){
-    setLogged(true);
-  }else{
-    setLogged(false);
-  }
-
+  useEffect(()=>{
+    console.log(persistLogin);
+    if(persistLogin){
+      setLogged(true);
+    }else{
+      setLogged(false);
+    }
+  },[])
 
 
 
   return (
     <div>
-      <Header hasHiddenAuthButtons={logged}>
+      <Header hasHiddenAuthButtons={true}>
         {
           logged ? 
           <>
           <Avatar alt={`${persistLogin.username}`} src="../assets/hero_image.png" /> 
           {persistLogin.username}
-          <Button className="button" variant="contained" 
+          <Button role='button' className="button" variant="contained" 
           onClick={()=>{
             localStorage.removeItem("persistLogin")
             history.push("/login")
             } }>
-           Log out
+           LOGOUT
            </Button>
           </>
            : 
            <>
-           <Button className="button" variant="contained" onClick={()=>{history.push("/login")}}>
-           Log in
-           </Button>
-           <Button className="button" variant="contained" onClick={()=>{history.push("/register")}}>
-           Register
-           </Button>
+            <Button className="button" variant="contained" onClick={()=>{history.push("/login")}}>
+            Log in
+            </Button>
+            <Button className="button" variant="contained" onClick={()=>{history.push("/register")}}>
+            Register
+            </Button>
            </>
         }
       </Header>

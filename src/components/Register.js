@@ -61,17 +61,12 @@ const Register = (props) => {
       let res = await axios.post(`${config.endpoint}/auth/register`, data);
       enqueueSnackbar('Registered successfully', {variant: "success"});
       setLoader(false)
+      history.push("/login")
     } catch(error){
       enqueueSnackbar(error.response.data.message, {variant: "error"});
       setLoader(false)
     } 
-  //   axios.post(`${config.endpoint}/auth/register`, data)
-  //   .then(function (response) {
-  //     enqueueSnackbar('Registered successfully')
-  //   })
-  //   .catch(function (error) {
-  //     enqueueSnackbar(error.response.data.message);
-  //   });
+
   };
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
