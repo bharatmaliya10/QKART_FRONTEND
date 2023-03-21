@@ -60,7 +60,6 @@ const Login = () => {
       enqueueSnackbar('Logged in successfully',  {variant: "success"});
       setLoader(false)
       history.push("/")
-      console.log(res.data)
     } catch(error){
       enqueueSnackbar(error.response.data.message,  {variant: "error"});
       setLoader(false)
@@ -82,7 +81,7 @@ const Login = () => {
    * -    Check that username field is not an empty value - "Username is a required field"
    * -    Check that password field is not an empty value - "Password is a required field"
    */
-  const validateInput = () => {
+  const validateInput = ( ) => {
     if(loginData.username.length===0 ){
       enqueueSnackbar('Username is required',  {variant: "warning"});
     } else if (loginData.username.length<6){
@@ -114,11 +113,13 @@ const Login = () => {
    */
   const persistLogin = (token, username, balance) => {
     let userDetails = {
-      token:token,
+      // token:token,
       username:username,
-      balance:balance
+      // balance:balance
     }
-    localStorage.setItem("persistLogin", JSON.stringify(userDetails));
+    localStorage.setItem("username", username);
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("token", token);
   };
 
   return (
@@ -150,24 +151,24 @@ const Login = () => {
             name="password"
             type="password"
             value={loginData.password}
-            // helperText="Password must be atleast 6 characters length"
+            helperText="Password must be atleast 6 characters length"
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
             onChange={handleChange}
           />
            <Button className="button" variant="contained" onClick={validateInput}>
-           { !Loader ? `Log in`: <CircularProgress color="inherit"/>} 
+           { !Loader ? `Login to Qkart`: <CircularProgress color="inherit"/>} 
            </Button>
           <p className="secondary-action">
             Don't Have an account?{" "}
              <a 
-             href='#'
+             href='/register'
              className="link" 
              onClick={()=>{
               history.push("/register")
               }}
               >
-              Register here
+              Register Now
              </a>
           </p>
         </Stack>

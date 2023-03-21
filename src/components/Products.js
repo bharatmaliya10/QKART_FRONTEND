@@ -22,10 +22,12 @@ import "./Products.css";
 const Products = () => {
   const history = useHistory();
   const [logged, setLogged] = useState(false);
-  let persistLogin = JSON.parse(localStorage.getItem('persistLogin'));
+  let username = localStorage.getItem('username')
+  let balance = localStorage.getItem('balance')
+  let token = localStorage.getItem('token')
+
   useEffect(()=>{
-    console.log(persistLogin);
-    if(persistLogin){
+    if(username){
       setLogged(true);
     }else{
       setLogged(false);
@@ -40,11 +42,13 @@ const Products = () => {
         {
           logged ? 
           <>
-          <Avatar alt={`${persistLogin.username}`} src="../assets/hero_image.png" /> 
-          {persistLogin.username}
+          <Avatar alt={`${username}`} src="../assets/hero_image.png" /> 
+          {username}
           <Button role='button' className="button" variant="contained" 
           onClick={()=>{
-            localStorage.removeItem("persistLogin")
+            localStorage.removeItem("username")
+            localStorage.removeItem("balance")
+            localStorage.removeItem("token")
             history.push("/login")
             } }>
            LOGOUT
@@ -53,7 +57,7 @@ const Products = () => {
            : 
            <>
             <Button className="button" variant="contained" onClick={()=>{history.push("/login")}}>
-            Log in
+            Login
             </Button>
             <Button className="button" variant="contained" onClick={()=>{history.push("/register")}}>
             Register

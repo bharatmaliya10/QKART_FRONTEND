@@ -87,12 +87,12 @@ const Register = (props) => {
    * -    Check that password field is not less than 6 characters in length - "Password must be at least 6 characters"
    * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
-  const validateInput = () => {
+  const validateInput = ( ) => {
     if(formData.username.length===0 ){
       enqueueSnackbar('Username is required', {variant: "warning"});
     } else if (formData.username.length<6){
       enqueueSnackbar('Username must be at least 6 characters', {variant: "warning"});
-    } else if (formData.password===0){
+    } else if (formData.password.length===0){
       enqueueSnackbar('Password is required', {variant: "warning"});
     } else if (formData.password.length<6){
       enqueueSnackbar('Password must be at least 6 characters', {variant: "warning"});
@@ -156,7 +156,7 @@ const Register = (props) => {
            </Button>
           <p className="secondary-action">
             Already have an account?{" "}
-             <a className="link" href="#"
+             <a className="link" href="/login"
               onClick={()=>{
                 history.push("/login")
                 }}
