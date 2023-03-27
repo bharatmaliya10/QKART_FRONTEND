@@ -29,15 +29,19 @@ const ProductCard = ({product,  handleAddToCart }) => {
         <Typography sx={{ fontWeight: 'bold' }} gutterBottom variant="h5" component="div">
           ${product.cost}
         </Typography>
-        <Rating
+        {/* <Rating
           name="simple-controlled"
           value={product.rating}
-        />
+        /> */}
+        <Rating name="half-rating-read" value={product.rating} readOnly />
       </CardContent>
       <CardActions>
-      <Button className="button" variant="contained" >
-      <AddShoppingCartOutlined />  ADD TO CART
-      </Button>
+      {/* <Button className="button" variant="contained" >
+      <AddShoppingCartOutlined />  add to cart
+      </Button> */}
+      <Button className="button" variant="contained" startIcon={<AddShoppingCartOutlined />} fullWidth>
+ ADD TO CART
+  </Button>
       </CardActions>
     </Card>
   );
