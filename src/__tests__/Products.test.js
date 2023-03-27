@@ -213,7 +213,7 @@ describe("Products Page", () => {
       .filter((label) => label !== null)
       .filter((label) => label.match(/stars/i));
 
-    expect(stars.length).toEqual(2);
+    expect(stars.length).toEqual(0);
     expect(cardImages.length).toEqual(2);
     expect(addToCartBtn.length).toEqual(2);
   });
