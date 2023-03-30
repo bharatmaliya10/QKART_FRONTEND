@@ -12,7 +12,6 @@ import React from "react";
 import "./ProductCard.css";
 
 const ProductCard = ({product,  handleAddToCart }) => {
-  let productId=product.productId
   return (
     <Card className="card">
       <CardMedia
