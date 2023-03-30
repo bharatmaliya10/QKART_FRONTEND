@@ -19,7 +19,7 @@ import Header from "./Header";
 import ProductCard from "./ProductCard";
 import "./Products.css";
 import Cart from './Cart'
-
+import {generateCartItemsFrom} from './Cart'
 
 
 const Products = () => {
@@ -30,7 +30,12 @@ const Products = () => {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(true)
     const [timerId, setTimerId] = useState(0)
-    // const [cartItems, setCartItems] = useState([])
+    const [cart, setCart] = useState([])
+    const [cartData, setCartData] = useState([])
+    // const [productData, setProductData] = useState([])
+
+
+
 
     // console.log(products);
 
@@ -38,6 +43,7 @@ const Products = () => {
     // let balance = localStorage.getItem('balance')
     let token = localStorage.getItem('token')
     // console.log(token)
+    let url = `${config.endpoint}/products`
 
     useEffect(() => {
         if (username) {
@@ -45,12 +51,20 @@ const Products = () => {
         } else {
             setLogged(false);
         }
+        onLoadHandler();
     }, [])
 
-    useEffect(() => {
+    useEffect( () => {
         debounceSearch(text, timerId);
     }, [text])
 
+     const onLoadHandler=async ()=>{
+         const productsData = await performAPICall(url);
+         const cartData = await fetchCart(token);
+         const cartDetail = await generateCartItemsFrom (cartData, productsData)
+         setCart(cartDetail)
+     }
+            
     // Definition of Data Structures used
     /**
    * @typedef {Object} Product - Data on product available to buy
@@ -63,16 +77,12 @@ const Products = () => {
    * @property {string} _id - Unique ID for the product
    */
 
-
-
-
-
     const performAPICall = async (url) => {
-        console.log(url);
         try {
             const response = await axios.get(url);
             setLoading(false);
             setProducts(response.data);
+            return(response.data);
         }
         catch (error) {
             setProducts([]);
@@ -96,7 +106,6 @@ const Products = () => {
      *
      */
     const performSearch = async (text) => {
-        let url = `${config.endpoint}/products`
 
         if (text !== '') {
             url = `${config.endpoint}/products/search?value=${text}`
@@ -139,19 +148,18 @@ const Products = () => {
      *
      * @returns { Array.<{ productId: string, qty: number }> | null }
      *    The response JSON object
-     *
      */
+
     const fetchCart = async (token) => {
         if (!token) return;
-        let url = `${config.endpoint}/cart`
         try {
-            // TODO: CRIO_TASK_MODULE_CART - Pass Bearer token inside "Authorization" header to get data from "GET /cart" API and return the response data
-            const {data} = await axios.get(url, {
+            const res = await axios.get(`${config.endpoint}/cart`, {
               headers:{
                 Authorization: `Bearer ${token}`
               }
             })
-            console.log(data)
+            setCartData(res.data);
+            return(res.data);
         } catch (e) {
             if (e.response && e.response.status === 400) {
                 enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -167,7 +175,6 @@ const Products = () => {
         }
     };
 
-    // fetchCart(token);
 
     // TODO: CRIO_TASK_MODULE_CART - Return if a product already exists in the cart
     /**
@@ -183,6 +190,19 @@ const Products = () => {
      *
      */
     const isItemInCart = (items, productId) => {
+        let result = false;
+        items.map((item)=>{
+            if (item.productId === productId ){
+                enqueueSnackbar(
+                    "Item already in cart. Use the cart sidebar to update quantity or remove item.",
+                    {
+                        variant: "warning",
+                    }
+                );
+                result = true
+            }
+        })
+        return result;
     };
 
     /**
@@ -201,24 +221,28 @@ const Products = () => {
      * @param {boolean} options
      *    If this function was triggered from the product card's "Add to Cart" button
      *
- 
      */
+
     const addToCart = async (
         token,
-        items,
-        products,
+        // items,
+        // products,
         productId,
-        qty,
-        options = { preventDuplicate: false }
+        // qty,
+        // options = { preventDuplicate: false }
     ) => {  
+      if(isItemInCart(cart, productId)) return
       let url = `${config.endpoint}/cart`
+      let payLoad =           {
+        "productId":`${productId}`,
+        "qty":1
+    }
       try{
-        const {data} = await axios.post(url, 
-          {"productId":"BW0jAAeDJmlZCF8i","qty":8},
+        const {data} = await axios.post(url, payLoad,
            {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             }
           }
         )
@@ -227,7 +251,12 @@ const Products = () => {
       }
 
     };
-    addToCart(token);
+
+    const addToCartfn = (e)=>{
+       let productId = e.target.id
+        addToCart(token, productId);
+        onLoadHandler();
+    }
 
     return (
         <div>
@@ -281,13 +310,13 @@ const Products = () => {
                                     products.map((product) => {
                                         return (
                                             <Grid key={product._id} item xs={6} md={3}>
-                                                <ProductCard product={product} />
+                                                <ProductCard handleAddToCart={addToCart} product={product} />
                                             </Grid>
                                         );
                                     })}
                         </Grid>
                 }
-                <Cart/>
+                <Cart items={cart} handleQuantity={addToCartfn}/>
             </Grid>
             <Footer />
         </div>
